@@ -1,6 +1,30 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
+  interface User {
+    created_at: string | null;
+    email: string;
+    id: string;
+    name: string | null;
+  }
+
+  const [data, setData] = useState<User[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase.from("users").select("*");
+      if (error) setError(error.message);
+      setData(data);
+    };
+
+    fetchUsers();
+  }, []);
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -47,6 +71,20 @@ export default function Home() {
           >
             Read our docs
           </a>
+          <a
+            className="rounded-full border border-solid border-blue-500 transition-colors flex items-center justify-center bg-blue-500 text-white gap-2 hover:bg-blue-600 text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+            href="/login"
+          >
+            Log In
+          </a>
+          <div>
+            <h1>Local Supabase Test</h1>
+            {error ? (
+              <p style={{ color: "red" }}>Error: {error}</p>
+            ) : (
+              <pre>{JSON.stringify(data, null, 2)}</pre>
+            )}
+          </div>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
