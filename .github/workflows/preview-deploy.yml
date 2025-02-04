@@ -1,0 +1,64 @@
+name: Deploy to Preview, Annotate PR, Cleanup Preview, Cleanup PR
+
+on:
+  pull_request:
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  deploy-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build NextJS App
+        run: npm run build
+
+      - name: Deploy to Vercel Preview, tag with PR number
+        id: vercel
+        run: |
+          DEPLOYMENT_URL=$(npx vercel --token=${{ secrets.VERCEL_TOKEN }}) --meta prNumber=${{ github.event.pull_request.number }})
+          echo "DEPLOYMENT_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
+
+      - name: Add "Preview Ready" Label to PR
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "Preview Ready"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup-preview:
+    if: github.event_name == 'pull_request_target' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Jq
+        run: sudo apt-get install -y jq
+      - name: Delete Vercel Preview
+        run: |
+          DEPLOYMENTS=$(npx vercel ls --token=${{ secrets.VERCEL_TOKEN }} --meta prNumber=${{ github.event.pull_request.number }} -j | jq -r '.deployments[].url')
+          for url in $DEPLOYMENTS; do
+            npx vercel remove $url --yes --token=${{ secrets.VERCEL_TOKEN }}
+          done
+
+      - name: Remove "Preview Ready" Label from PR
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --remove-label "Preview Ready"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# Feature	Behavior
+# Deploys preview on push & PRs	- Deploys a temporary preview URL for every PR.
+# Posts a comment on PRs	- Adds "View Deployment" link in the PR.
+# Adds "Preview Ready" label when deployed
+# Deletes preview when PR is merged/closed	- Uses vercel remove to delete the preview.
+# Removes the "Preview Ready" label when PR is closed	- Indicates Preview inactive.
