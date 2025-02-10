@@ -28,7 +28,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-6">
                     <div className="text-m bg-white font-bold text-black hover:bg-gray-200 dark:bg-black dark:text-white dark:hover:bg-gray-800">
                         <Link
-                            href="/"
+                            href="/login"
                             className="bg-white font-bold text-black text-inherit hover:bg-gray-200 dark:bg-black dark:text-white dark:hover:bg-gray-800"
                         >
                             Login
