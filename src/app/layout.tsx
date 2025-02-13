@@ -21,7 +21,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.className}`}>
-                <header className="sticky top-0 z-50 border-b border-gray-200 bg-white dark:bg-gray-900">
+                <header className="sticky top-0 z-50 bg-white dark:bg-gray-900">
                     <Navbar />
                 </header>
                 <main className="min-h-[calc(100vh-64px)]">{children}</main>

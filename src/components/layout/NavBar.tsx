@@ -1,6 +1,14 @@
+'use client'
 import Link from 'next/link'
+import { useState } from 'react'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+
+const navLinkStyles =
+    'text-gray-600 px-3 py-1.5 rounded-md transition-all duration-300 hover:cursor-pointer hover:bg-gray-100 hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-800'
 
 export default function Navbar() {
+    const [searchQuery, setSearchQuery] = useState('')
+
     return (
         <nav className="mx-auto max-w-7xl bg-blue-100/80 px-4 font-sans sm:px-6 lg:px-8 dark:bg-gray-900">
             <div className="flex h-16 items-center justify-between">
@@ -14,34 +22,37 @@ export default function Navbar() {
                             Jiggle Bliss
                         </h1>
                     </Link>
-                    <div className="hidden space-x-6 md:flex">
-                        <Link
-                            href="/products"
-                            className="text-m bg-white font-bold text-black hover:bg-gray-200 hover:text-gray-600 dark:bg-black dark:text-white dark:hover:bg-gray-800"
-                        >
-                            Products
+                    <div className="hidden items-center space-x-6 md:flex">
+                        <Link href="/products" className={navLinkStyles}>
+                            Catalog
                         </Link>
+                        {/* Search Bar */}
+                        <div className="relative">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <MagnifyingGlassIcon
+                                    className="h-5 w-5 text-gray-400"
+                                    aria-hidden="true"
+                                />
+                            </div>
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="block w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="Search products..."
+                            />
+                        </div>
                     </div>
                 </div>
 
                 {/* Right Side - Auth & Cart */}
-                <div className="flex items-center gap-6">
-                    <div className="text-m bg-white font-bold text-black hover:bg-gray-200 dark:bg-black dark:text-white dark:hover:bg-gray-800">
-                        <Link
-                            href="/auth/login"
-                            className="bg-white font-bold text-black text-inherit hover:bg-gray-200 dark:bg-black dark:text-white dark:hover:bg-gray-800"
-                        >
-                            Login
-                        </Link>
-                    </div>
-                    <div className="text-m bg-white font-bold text-black dark:bg-black dark:text-white">
-                        <Link
-                            href="/"
-                            className="bg-white font-bold text-black text-inherit hover:bg-gray-200 dark:bg-black dark:text-white dark:hover:bg-gray-800"
-                        >
-                            Cart
-                        </Link>
-                    </div>
+                <div className="flex items-center space-x-6">
+                    <Link href="/auth/login" className={navLinkStyles}>
+                        Login
+                    </Link>
+                    <Link href="/" className={navLinkStyles}>
+                        Cart
+                    </Link>
                 </div>
             </div>
         </nav>
