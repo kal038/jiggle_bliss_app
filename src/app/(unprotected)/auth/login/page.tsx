@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 const validateEmail = (email: string): string | null => {
     /*
@@ -34,9 +35,12 @@ const validatePassword = (password: string): string | null => {
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [fullName, setFullName] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [isSignUp, setIsSignUp] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault()
@@ -66,79 +70,120 @@ export default function LoginPage() {
         }
     }
 
+    const renderForm = () => (
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+            <div>
+                <label htmlFor="email" className="sr-only">
+                    Email address
+                </label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (error) setError('')
+                    }}
+                    disabled={isLoading}
+                />
+            </div>
+            <div>
+                <label htmlFor="password" className="sr-only">
+                    Password
+                </label>
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => {
+                        setPassword(e.target.value)
+                        if (error) setError('')
+                    }}
+                    disabled={isLoading}
+                />
+            </div>
+            {isSignUp && (
+                <div>
+                    <label htmlFor="confirmPassword" className="sr-only">
+                        Confirm password
+                    </label>
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        placeholder="Confirm password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={isLoading}
+                    />
+                </div>
+            )}
+            <div>
+                <button
+                    type="submit"
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                    disabled={isLoading}
+                >
+                    {isLoading
+                        ? 'Processing...'
+                        : isSignUp
+                          ? 'Create Account'
+                          : 'Sign In'}
+                </button>
+            </div>
+            <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-2 text-gray-500">Or</span>
+                </div>
+            </div>
+            <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="group relative flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+                {isSignUp
+                    ? 'Already have an account? Sign in instead'
+                    : 'Create an account'}
+            </button>
+        </form>
+    )
+
     return (
-        <div className="flex min-h-screen items-center justify-end bg-gray-50 pr-32">
-            <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow">
-                <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-                    Sign in to your account
-                </h2>
-
-                {error && (
-                    <div className="text-center text-red-500">{error}</div>
-                )}
-
-                {success ? (
-                    <div className="rounded-md bg-green-50 p-4">
-                        <div className="text-center text-green-800">
-                            Check your email for the magic link to sign in!
-                        </div>
-                    </div>
-                ) : (
-                    <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="email" className="sr-only">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                required
-                                className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                                placeholder="Email address"
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value)
-                                    if (error) {
-                                        setError('')
-                                    }
-                                }}
-                                disabled={isLoading}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="email" className="sr-only">
-                                Email address
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value)
-                                    if (error) {
-                                        setError('')
-                                    }
-                                }}
-                                disabled={isLoading}
-                            />
-                        </div>
-
-                        <div>
-                            <button
-                                type="submit"
-                                className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Signing you in...' : 'Sign In'}
-                            </button>
-                        </div>
-                    </form>
-                )}
+        <div className="flex h-screen w-full overflow-hidden">
+            {/* Hero image on left side */}
+            <div className="relative hidden w-1/2 md:flex">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-white/20" />
+                <Image
+                    src="/images/hero-login.jpg" // Add your image to public folder
+                    alt="Login hero image"
+                    className="object-cover"
+                    fill // Image will fill its parent container
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                />
+            </div>
+            <div className="relative flex w-1/2 items-center justify-end bg-gradient-to-l from-white via-white to-transparent pl-16 pr-32">
+                <div className="blackdrop-blur-sm w-full max-w-md space-y-8 rounded-xl bg-white/80 p-8">
+                    <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+                        {isSignUp
+                            ? 'This is going to be fun!'
+                            : 'Sign in to your account'}
+                    </h2>
+                    {renderForm()}
+                </div>
             </div>
         </div>
     )
