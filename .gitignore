@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# TODO
+/TODO.todo
+
+
 # next.js
 /.next/
 /out/

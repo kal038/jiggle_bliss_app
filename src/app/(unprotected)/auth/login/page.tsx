@@ -13,51 +13,61 @@ const validateEmail = (email: string): string | null => {
     return null
 }
 
+const validatePassword = (password: string): string | null => {
+    /*
+    Return an error string if the password is invalid, else return null to indicate no error.
+    */
+    if (!password) return 'Password is required'
+    if (password.length < 8) return 'Password must be at least 8 characters'
+    if (password.length > 255) return 'Password is too long'
+
+    const hasUpper = /[A-Z]/.test(password)
+    const hasNum = /[0-9]/.test(password)
+    const hasSpecial = /[!@#$%^]/.test(password)
+
+    if (!hasUpper || !hasNum || !hasSpecial)
+        return 'Password must contain at least one uppercase letter, one number, and one special character in !, @, #, $, %, ^'
+
+    return null
+}
+
 export default function LoginPage() {
     const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault()
         setError('')
         setSuccess(false)
-
-        // Validate email
-        const validationError = validateEmail(email)
-        if (validationError) {
-            setError(validationError)
-            return
-        }
-
         setIsLoading(true)
-
         try {
-            const response = await fetch('/api/auth/magic-link', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: email.toLowerCase().trim() }),
-            })
-
-            if (response.ok) {
-                setSuccess(true)
-                setEmail('')
-            } else {
-                const data = await response.json()
-                setError(data.error || 'Failed to send magic link')
+            // Validate email
+            const validationErrorEmail = validateEmail(email)
+            if (validationErrorEmail) {
+                setError(validationErrorEmail)
+                return
             }
-        } catch (err) {
-            setError('Something went wrong. Please try again.')
+            // Validate password
+            const validationErrorPassword = validatePassword(password)
+            if (validationErrorPassword) {
+                setError(validationErrorPassword)
+                return
+            }
+
+            setSuccess(true)
+        } catch (error) {
+            setError('An unexpected error occurred. Please try again.')
+            console.error('Unexpected login error: ', error)
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="flex min-h-screen items-center justify-end bg-gray-50 pr-32">
             <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow">
                 <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
                     Sign in to your account
@@ -74,7 +84,7 @@ export default function LoginPage() {
                         </div>
                     </div>
                 ) : (
-                    <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                    <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="sr-only">
                                 Email address
@@ -85,11 +95,34 @@ export default function LoginPage() {
                                 type="email"
                                 required
                                 className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                                placeholder="Enter your email address"
+                                placeholder="Email address"
                                 value={email}
                                 onChange={(e) => {
                                     setEmail(e.target.value)
-                                    setError('')
+                                    if (error) {
+                                        setError('')
+                                    }
+                                }}
+                                disabled={isLoading}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="email" className="sr-only">
+                                Email address
+                            </label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => {
+                                    setPassword(e.target.value)
+                                    if (error) {
+                                        setError('')
+                                    }
                                 }}
                                 disabled={isLoading}
                             />
@@ -101,7 +134,7 @@ export default function LoginPage() {
                                 className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
                                 disabled={isLoading}
                             >
-                                {isLoading ? 'Sending...' : 'Send Magic Link'}
+                                {isLoading ? 'Signing you in...' : 'Sign In'}
                             </button>
                         </div>
                     </form>
