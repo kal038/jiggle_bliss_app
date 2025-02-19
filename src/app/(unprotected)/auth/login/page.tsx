@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const validateEmail = (email: string): string | null => {
     /*
@@ -47,6 +48,7 @@ export default function LoginPage() {
         setError('')
         setSuccess(false)
         setIsLoading(true)
+        const supabase = createClientComponentClient()
         try {
             // Validate email
             const validationErrorEmail = validateEmail(email)
@@ -61,15 +63,52 @@ export default function LoginPage() {
                 return
             }
 
-            setSuccess(true)
+            if (isSignUp) {
+                // Validate confirm password
+                if (password !== confirmPassword) {
+                    setError('Passwords do not match')
+                    return
+                }
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                })
+                if (error) throw error
+                setSuccess(true)
+            } else {
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                })
+                if (error) throw error
+                setSuccess(true)
+            }
         } catch (error) {
             setError('An unexpected error occurred. Please try again.')
             console.error('Unexpected login error: ', error)
         } finally {
             setIsLoading(false)
         }
+        // all checks passed at this point
     }
-
+    const renderMessages = () => (
+        <div className="mt-4">
+            {error && (
+                <div
+                    className={`rounded-md p-4 text-sm ${
+                        error.includes('check your email')
+                            ? 'bg-green-50 text-green-700'
+                            : 'bg-red-50 text-red-700'
+                    }`}
+                >
+                    {error}
+                </div>
+            )}
+        </div>
+    )
     const renderForm = () => (
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             <div>
@@ -182,6 +221,7 @@ export default function LoginPage() {
                             ? 'This is going to be fun!'
                             : 'Sign in to your account'}
                     </h2>
+                    {renderMessages()}
                     {renderForm()}
                 </div>
             </div>
