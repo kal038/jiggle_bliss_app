@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
+
 const validateEmail = (email: string): string | null => {
     /*
     Return an error string if the email is invalid, else return null to indicate no error.
@@ -200,6 +201,99 @@ export default function LoginPage() {
         </form>
     )
 
+
+    const renderForm = () => (
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+            <div>
+                <label htmlFor="email" className="sr-only">
+                    Email address
+                </label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (error) setError('')
+                    }}
+                    disabled={isLoading}
+                />
+            </div>
+            <div>
+                <label htmlFor="password" className="sr-only">
+                    Password
+                </label>
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => {
+                        setPassword(e.target.value)
+                        if (error) setError('')
+                    }}
+                    disabled={isLoading}
+                />
+            </div>
+            {isSignUp && (
+                <div>
+                    <label htmlFor="confirmPassword" className="sr-only">
+                        Confirm password
+                    </label>
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        placeholder="Confirm password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={isLoading}
+                    />
+                </div>
+            )}
+            <div>
+                <button
+                    type="submit"
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                    disabled={isLoading}
+                >
+                    {isLoading
+                        ? 'Processing...'
+                        : isSignUp
+                          ? 'Create Account'
+                          : 'Sign In'}
+                </button>
+            </div>
+            <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-2 text-gray-500">Or</span>
+                </div>
+            </div>
+            <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="group relative flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+                {isSignUp
+                    ? 'Already have an account? Sign in instead'
+                    : 'Create an account'}
+            </button>
+        </form>
+    )
+
+
     return (
         <div className="flex h-screen w-full overflow-hidden">
             {/* Hero image on left side */}
@@ -221,6 +315,7 @@ export default function LoginPage() {
                             ? 'This is going to be fun!'
                             : 'Sign in to your account'}
                     </h2>
+
                     {renderMessages()}
                     {renderForm()}
                 </div>
