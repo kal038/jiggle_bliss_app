@@ -24,7 +24,7 @@ export default function Navbar() {
                     </Link>
                     <div className="hidden items-center space-x-6 md:flex">
                         <Link href="/products" className={navLinkStyles}>
-                            Catalog
+                            Shop All
                         </Link>
                         {/* Search Bar */}
                         <div className="relative">

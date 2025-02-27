@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import type { Database } from '@/lib/database.types'
 import ProductCard from '@/components/product/ProductCard'
+import Link from 'next/link'
 
 export default async function HomePage() {
     const supabase = createServerComponentClient<Database>({ cookies })
@@ -43,12 +44,12 @@ export default async function HomePage() {
                         ))}
                     </div>
                     <div className="mt-12 text-center">
-                        <a
+                        <Link
                             href="/products"
                             className="inline-block rounded-md bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700"
                         >
                             View All Products
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
