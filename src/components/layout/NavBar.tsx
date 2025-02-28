@@ -2,12 +2,14 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { useCartStore } from '@/store/useCartStore'
 
 const navLinkStyles =
     'text-gray-600 px-3 py-1.5 rounded-md transition-all duration-300 hover:cursor-pointer hover:bg-gray-100 hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-800'
 
 export default function Navbar() {
     const [searchQuery, setSearchQuery] = useState('')
+    //const totalItems = useCartStore((state) => state.totalItems)
 
     return (
         <nav className="mx-auto max-w-7xl bg-blue-100/80 px-4 font-sans sm:px-6 lg:px-8 dark:bg-gray-900">
@@ -51,7 +53,12 @@ export default function Navbar() {
                         Login
                     </Link>
                     <Link href="/" className={navLinkStyles}>
-                        Cart
+                        {/* <span className="relative"> Cart </span>
+                        {totalItems > 0 && (
+                            <span className="absolute -right-1 -top-1 rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
+                                {totalItems}
+                            </span>
+                        )} */}
                     </Link>
                 </div>
             </div>

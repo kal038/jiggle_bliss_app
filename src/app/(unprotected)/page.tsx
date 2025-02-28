@@ -7,17 +7,17 @@ import Link from 'next/link'
 export default async function HomePage() {
     const supabase = createServerComponentClient<Database>({ cookies })
 
-    // Fetch featured or latest products
+    // TODO: fetch featured products only
     const { data: products, error } = await supabase
         .from('products')
         .select('*')
-        .limit(6) // Show only 6 products on homepage
+        .limit(4) // Show only 6 products on homepage
         .order('created_at', { ascending: false })
 
     if (error) {
         console.error(error)
     }
-
+    
     return (
         <main className="flex-1">
             {/* Hero Section */}
