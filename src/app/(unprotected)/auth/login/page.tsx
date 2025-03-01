@@ -48,14 +48,14 @@ export default function LoginPage() {
         setError('')
         setSuccess(false)
         setIsLoading(true)
+
+        // Add this line to test loading state
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+
         const supabase = createClientComponentClient()
         try {
             // Validate email
             const validationErrorEmail = validateEmail(email)
-            if (validationErrorEmail) {
-                setError(validationErrorEmail)
-                return
-            }
             // Validate password
             const validationErrorPassword = validatePassword(password)
             if (validationErrorPassword) {
@@ -109,99 +109,9 @@ export default function LoginPage() {
             )}
         </div>
     )
-    // const renderForm = () => (
-    //     <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-    //         <div>
-    //             <label htmlFor="email" className="sr-only">
-    //                 Email address
-    //             </label>
-    //             <input
-    //                 id="email"
-    //                 name="email"
-    //                 type="email"
-    //                 required
-    //                 className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-    //                 placeholder="Email address"
-    //                 value={email}
-    //                 onChange={(e) => {
-    //                     setEmail(e.target.value)
-    //                     if (error) setError('')
-    //                 }}
-    //                 disabled={isLoading}
-    //             />
-    //         </div>
-    //         <div>
-    //             <label htmlFor="password" className="sr-only">
-    //                 Password
-    //             </label>
-    //             <input
-    //                 id="password"
-    //                 name="password"
-    //                 type="password"
-    //                 required
-    //                 className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-    //                 placeholder="Password"
-    //                 value={password}
-    //                 onChange={(e) => {
-    //                     setPassword(e.target.value)
-    //                     if (error) setError('')
-    //                 }}
-    //                 disabled={isLoading}
-    //             />
-    //         </div>
-    //         {isSignUp && (
-    //             <div>
-    //                 <label htmlFor="confirmPassword" className="sr-only">
-    //                     Confirm password
-    //                 </label>
-    //                 <input
-    //                     id="confirmPassword"
-    //                     name="confirmPassword"
-    //                     type="password"
-    //                     required
-    //                     className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-    //                     placeholder="Confirm password"
-    //                     value={confirmPassword}
-    //                     onChange={(e) => setConfirmPassword(e.target.value)}
-    //                     disabled={isLoading}
-    //                 />
-    //             </div>
-    //         )}
-    //         <div>
-    //             <button
-    //                 type="submit"
-    //                 className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
-    //                 disabled={isLoading}
-    //             >
-    //                 {isLoading
-    //                     ? 'Processing...'
-    //                     : isSignUp
-    //                       ? 'Create Account'
-    //                       : 'Sign In'}
-    //             </button>
-    //         </div>
-    //         <div className="relative">
-    //             <div className="absolute inset-0 flex items-center">
-    //                 <div className="w-full border-t border-gray-300" />
-    //             </div>
-    //             <div className="relative flex justify-center text-sm">
-    //                 <span className="bg-white px-2 text-gray-500">Or</span>
-    //             </div>
-    //         </div>
-    //         <button
-    //             type="button"
-    //             onClick={() => setIsSignUp(!isSignUp)}
-    //             className="group relative flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-    //         >
-    //             {isSignUp
-    //                 ? 'Already have an account? Sign in instead'
-    //                 : 'Create an account'}
-    //         </button>
-    //     </form>
-    // )
 
     const renderForm = () => (
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+        <form className="mt-4 space-y-4 sm:mt-8" onSubmit={handleSubmit}>
             <div>
                 <label htmlFor="email" className="sr-only">
                     Email address
@@ -211,7 +121,7 @@ export default function LoginPage() {
                     name="email"
                     type="email"
                     required
-                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     placeholder="Email address"
                     value={email}
                     onChange={(e) => {
@@ -230,7 +140,7 @@ export default function LoginPage() {
                     name="password"
                     type="password"
                     required
-                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => {
@@ -250,7 +160,7 @@ export default function LoginPage() {
                         name="confirmPassword"
                         type="password"
                         required
-                        className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        className="relative block w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                         placeholder="Confirm password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -261,7 +171,7 @@ export default function LoginPage() {
             <div>
                 <button
                     type="submit"
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 sm:py-2 sm:text-sm"
                     disabled={isLoading}
                 >
                     {isLoading
@@ -292,22 +202,24 @@ export default function LoginPage() {
     )
 
     return (
-        <div className="flex h-screen w-full overflow-hidden">
-            {/* Hero image on left side */}
-            <div className="relative hidden w-1/2 md:flex">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-white/20" />
+        <main className="relative min-h-screen w-full">
+            {/* Hero image container */}
+            <div className="absolute inset-0">
+                <div className="absolute inset-0 bg-black/40" />
                 <Image
-                    src="/images/hero-login.jpg" // Add your image to public folder
+                    src="/images/hero-login.jpg"
                     alt="Login hero image"
                     className="object-cover"
-                    fill // Image will fill its parent container
+                    fill
                     priority
-                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                 />
             </div>
-            <div className="relative flex w-1/2 items-center justify-end bg-gradient-to-l from-white via-white to-transparent pl-16 pr-32">
-                <div className="blackdrop-blur-sm w-full max-w-md space-y-8 rounded-xl bg-white/80 p-8">
-                    <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+
+            {/* Form container */}
+            <div className="absolute inset-0 flex items-center justify-center px-4 py-6 sm:p-6">
+                <div className="w-full max-w-md space-y-6 rounded-xl bg-white/90 p-6 shadow-xl backdrop-blur-sm sm:space-y-8 sm:p-8">
+                    <h2 className="text-center text-2xl font-bold text-gray-900 sm:text-3xl">
                         {isSignUp
                             ? 'This is going to be fun!'
                             : 'Sign in to your account'}
@@ -317,6 +229,6 @@ export default function LoginPage() {
                     {renderForm()}
                 </div>
             </div>
-        </div>
+        </main>
     )
 }
