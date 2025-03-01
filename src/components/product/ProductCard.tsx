@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Database } from '@/lib/database.types'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useCartStore } from '@/store/useCartStore'
 
 type Product = Database['public']['Tables']['products']['Row']
 
@@ -12,7 +13,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
     const [quantity, setQuantity] = useState(0)
+    const addItem = useCartStore((state) => state.addItem)
+    const items = useCartStore((state) => state.items)
+    const decrementItem = useCartStore((state) => state.decrementItem)
     const handleIncrementCart = () => {
+        addItem(product)
         setQuantity(quantity + 1)
         toast.success(`${product.name} added to cart`, {
             duration: 2000,
@@ -21,6 +26,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     const handleDecrementCart = () => {
+        decrementItem(product.id)
         setQuantity(quantity - 1)
         toast.error(`${product.name} removed`, {
             duration: 2000,
@@ -48,7 +54,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                     </h3>
                     <p className="mt-1 text-gray-500">{product.description}</p>
                 </div>
-
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
                         <p className="text-2xl font-bold text-gray-900">
@@ -59,32 +64,14 @@ export default function ProductCard({ product }: ProductCardProps) {
                         </p>
                     </div>
                 </div>
-                {quantity === 0 ? (
-                    <button
-                        onClick={handleIncrementCart}
-                        className="w-full rounded-lg bg-indigo-600 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
-                    >
-                        Add to Cart
-                    </button>
-                ) : (
-                    <div className="flex items-center justify-between">
-                        <button
-                            onClick={handleDecrementCart}
-                            className="w-1/3 rounded-lg bg-indigo-600 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
-                        >
-                            -
-                        </button>
-                        <span className="font-medium text-gray-900 transition-all duration-200 ease-in-out">
-                            {quantity}
-                        </span>
-                        <button
-                            onClick={handleIncrementCart}
-                            className="w-1/3 rounded-lg bg-indigo-600 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
-                        >
-                            +
-                        </button>
-                    </div>
-                )}
+                (
+                <button
+                    onClick={handleIncrementCart}
+                    className="w-full rounded-lg bg-indigo-600 py-3 font-medium text-white transition-colors hover:bg-indigo-700"
+                >
+                    Add to Cart
+                </button>
+                )
             </div>
         </div>
     )

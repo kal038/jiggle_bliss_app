@@ -17,7 +17,7 @@ export default async function HomePage() {
     if (error) {
         console.error(error)
     }
-    
+
     return (
         <main className="flex-1">
             {/* Hero Section */}
