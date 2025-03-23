@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 // AuthProvider is a component that wraps the children with the AuthProvider
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser) // selector to only get fetchCurrentUser
-    const supabase = createClientComponentClient()
+    const supabase = createClientComponentClient() //create supabase browser client
     // useEffect on user change
     useEffect(() => {
         fetchCurrentUser()
