@@ -17,14 +17,22 @@ export const useAuthStore = create<AuthState>((set, get) => {
     user: null,
     isLoading: true,
     fetchCurrentUser: async () => {
-            const {data: {user}, error} = await supabase.auth.getUser() 
+            const {data: {session}, error} = await supabase.auth.getSession() 
             if (error) throw error
-            set({user: user || null, isLoading: false})
+            set({user: session?.user || null, isLoading: false})
     },
     signIn: async (email, password) => {
-        const {error} = await supabase.auth.signInWithPassword({email, password})
-        if (error) throw error
-        await get().fetchCurrentUser
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            })
+            if (error) throw error
+            await get().fetchCurrentUser()
+        } catch (error) {
+            console.error('Sign in error:', error)
+            throw error
+        }
     },
     signOut: async () => {
         try{
