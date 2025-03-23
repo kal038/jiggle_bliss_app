@@ -42,7 +42,7 @@ export default function Navbar({ user, isLoading }: NavbarProps) {
     const handleSignOut = async () => {
         try {
             await signOut()
-            router.push('/auth/login')
+            router.push('/') //forces a redirect to home, could this be handled with middlware?
         } catch (error) {
             console.error('Error signing out', error)
         }
@@ -54,15 +54,15 @@ export default function Navbar({ user, isLoading }: NavbarProps) {
 
     return (
         <>
-            <nav className="mx-auto max-w-7xl bg-blue-100/80 px-4 font-sans sm:px-6 lg:px-8 dark:bg-gray-900">
+            <nav className="mx-auto max-w-7xl bg-blue-100/80 px-4 font-sans dark:bg-gray-900 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     {/* Left Side - Logo & Navigation */}
                     <div className="flex items-center space-x-8">
                         <Link
                             href="/"
-                            className="dark:text-white0 max-w-lg text-xl font-semibold tracking-tight text-gray-800 transition-colors duration-300 hover:cursor-pointer hover:text-blue-500 hover:underline xl:text-2xl dark:text-gray-300 dark:hover:text-blue-400"
+                            className="dark:text-white0 max-w-lg text-xl font-semibold tracking-tight text-gray-800 transition-colors duration-300 hover:cursor-pointer hover:text-blue-500 hover:underline dark:text-gray-300 dark:hover:text-blue-400 xl:text-2xl"
                         >
-                            <h1 className="max-w-lg text-xl font-semibold tracking-tight text-gray-800 transition-colors duration-300 hover:cursor-pointer hover:text-blue-500 hover:underline xl:text-2xl dark:text-gray-300 dark:hover:text-blue-400">
+                            <h1 className="max-w-lg text-xl font-semibold tracking-tight text-gray-800 transition-colors duration-300 hover:cursor-pointer hover:text-blue-500 hover:underline dark:text-gray-300 dark:hover:text-blue-400 xl:text-2xl">
                                 Jiggle Bliss
                             </h1>
                         </Link>

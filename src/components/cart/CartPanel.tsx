@@ -170,7 +170,7 @@ export default function CartPanel({ isOpen, onClose }: CartPanelProps) {
                                             <p>Calculated at checkout</p>
                                         </div>
                                         <button
-                                            className="mt-4 w-full rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                                            className="mt-4 w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
                                             onClick={() => {
                                                 /* handle checkout */
                                             }}

@@ -3,9 +3,12 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useEffect } from 'react'
 
-// inline props for children
+interface AuthProviderProps {
+    children: React.ReactNode
+}
+
 // AuthProvider is a component that wraps the children with the AuthProvider
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
     const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser) // selector to only get fetchCurrentUser
     const supabase = createClientComponentClient() //create supabase browser client
     // useEffect on user change
