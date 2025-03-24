@@ -27,7 +27,7 @@ export default function Navbar({ user, isLoading }: NavbarProps) {
     const [isCartOpen, setIsCartOpen] = useState(false)
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
-    const totalItems = useCartStore((state) => state.totalItems) //only rerenders when totalItems changes
+    const totalItems = useCartStore((state) => state.getTotalItems())
     const signOut = useAuthStore((state) => state.signOut)
 
     useEffect(() => {

@@ -7,7 +7,7 @@ import Link from 'next/link'
 export default async function HomePage() {
     const supabase = createServerComponentClient<Database>({ cookies })
 
-    // TODO: fetch featured products only
+    //TODO: hit an api route to get the products
     const { data: products, error } = await supabase
         .from('products')
         .select('*')
