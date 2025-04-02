@@ -7,11 +7,11 @@ import Link from 'next/link'
 export default async function HomePage() {
     const supabase = createServerComponentClient<Database>({ cookies })
 
-    //TODO: hit an api route to get the products
+    //TODO: hit an api route to get the products instead of calling supabase directly
     const { data: products, error } = await supabase
         .from('products')
         .select('*')
-        .limit(4) // Show only 6 products on homepage
+        .limit(3) // Show only featured products on home page
         .order('created_at', { ascending: false })
 
     if (error) {
