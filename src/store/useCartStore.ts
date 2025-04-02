@@ -1,5 +1,5 @@
 import { Database } from "@/lib/database.types";
-import { persist} from "zustand/middleware";
+import { devtools, persist} from "zustand/middleware";
 import {create} from 'zustand';
 
 type Product = Database['public']['Tables']['products']['Row'];
@@ -11,30 +11,35 @@ interface CartItem {
 
 interface CartStore {
     items: Record<string, CartItem>;
-    totalItems: number;
+    getTotalItems: () => number;
     addItem: (product: Product) => void;
     decrementItem(productId: string): void;
     clearCart: () => void;
 }
 
-export const useCartStore = create<CartStore>()(
+export const useCartStore = create<CartStore>()(devtools(
     persist(
-        (set) => ({
+        (set, get) => ({
             items: {}, // Record {productId:{product, quantity}}
-            totalItems: 0,
+            
+            getTotalItems: () => {
+                const state = get();
+                return Object.values(state.items).reduce(
+                    (total, item) => total + item.quantity, 0
+                );
+            },
             
             // Action: add full product to cart
             addItem: (product: Product) => 
                 set((state) => {
                     return {
                         items: {
-                            ...state.items, //spread previous items, add new item
+                            ...state.items,
                             [product.id]: {
                                 product: product,
                                 quantity: (state.items[product.id]?.quantity || 0) + 1
                             }
-                        },
-                        totalItems: state.totalItems + 1
+                        }
                     };
                 }),
 
@@ -44,8 +49,7 @@ export const useCartStore = create<CartStore>()(
                     if (!currentItem || currentItem.quantity <= 1) {
                         const { [productId]: removed, ...remainingItems } = state.items;
                         return {
-                            items: remainingItems,
-                            totalItems: state.totalItems - 1
+                            items: remainingItems
                         };
                     }
                     return {
@@ -55,12 +59,10 @@ export const useCartStore = create<CartStore>()(
                                 ...currentItem,
                                 quantity: currentItem.quantity - 1
                             }
-                        },
-                        totalItems: state.totalItems - 1
+                        }
                     };
                 }),
 
-            // Action: update product with productId to have quantity
             updateQuantity: (productId: string, newQuantity: number) => 
                 set((state) => {
                     return {
@@ -70,15 +72,14 @@ export const useCartStore = create<CartStore>()(
                                 ...state.items[productId],
                                 quantity: newQuantity
                             }
-                        },
-                        totalItems: state.totalItems +newQuantity
+                        }
                     };
-                }
-            ),
-            clearCart: () => set({ items: {}, totalItems: 0 })
+                }),
+                
+            clearCart: () => set({ items: {} })
         }),
         {
             name: 'cart-storage',
         }
-    )
+    ), {enabled: true})
 );

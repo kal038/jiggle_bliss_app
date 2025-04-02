@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { AuthError } from '@supabase/supabase-js'
+import { useRouter } from 'next/navigation'
 
 const validateEmail = (email: string): string | null => {
     /*
@@ -34,6 +36,7 @@ const validatePassword = (password: string): string | null => {
 }
 
 export default function LoginPage() {
+    const router = useRouter()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [fullName, setFullName] = useState('')
@@ -56,14 +59,18 @@ export default function LoginPage() {
         try {
             // Validate email
             const validationErrorEmail = validateEmail(email)
-            // Validate password
-            const validationErrorPassword = validatePassword(password)
-            if (validationErrorPassword) {
-                setError(validationErrorPassword)
+            if (validationErrorEmail) {
+                setError(validationErrorEmail)
                 return
             }
 
             if (isSignUp) {
+                // Validate password
+                const validationErrorPassword = validatePassword(password)
+                if (validationErrorPassword) {
+                    setError(validationErrorPassword)
+                    return
+                }
                 // Validate confirm password
                 if (password !== confirmPassword) {
                     setError('Passwords do not match')
@@ -85,10 +92,20 @@ export default function LoginPage() {
                 })
                 if (error) throw error
                 setSuccess(true)
+                router.push('/')
+                router.refresh()
             }
         } catch (error) {
-            setError('An unexpected error occurred. Please try again.')
-            console.error('Unexpected login error: ', error)
+            if (error instanceof AuthError) {
+                switch (error.message) {
+                    case 'Invalid login credentials':
+                        setError('Invalid email or password')
+                        break
+                }
+            } else {
+                setError('An unexpected error occurred. Please try again.')
+                console.error('Unexpected login error: ', error)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -121,7 +138,7 @@ export default function LoginPage() {
                     name="email"
                     type="email"
                     required
-                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     placeholder="Email address"
                     value={email}
                     onChange={(e) => {
@@ -136,18 +153,12 @@ export default function LoginPage() {
                     Password
                 </label>
                 <input
-                    id="password"
-                    name="password"
                     type="password"
                     required
-                    className="relative block w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Password"
                     value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value)
-                        if (error) setError('')
-                    }}
-                    disabled={isLoading}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Password"
                 />
             </div>
             {isSignUp && (
@@ -160,7 +171,7 @@ export default function LoginPage() {
                         name="confirmPassword"
                         type="password"
                         required
-                        className="relative block w-full appearance-none rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                         placeholder="Confirm password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}

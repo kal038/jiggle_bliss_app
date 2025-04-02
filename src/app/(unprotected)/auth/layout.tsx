@@ -13,14 +13,8 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({
     children,
-}: Readonly<{
+}: {
     children: React.ReactNode
-}>) {
-    return (
-        <div
-            className={`${inter.className} min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50`}
-        >
-            {children}
-        </div>
-    )
+}) {
+    return <main className="h-screen bg-white">{children}</main>
 }
