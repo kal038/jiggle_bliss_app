@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import { AuthError } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
@@ -55,7 +55,7 @@ export default function LoginPage() {
         // Add this line to test loading state
         await new Promise((resolve) => setTimeout(resolve, 2000))
 
-        const supabase = createClientComponentClient()
+        const supabase = createClient()
         try {
             // Validate email
             const validationErrorEmail = validateEmail(email)

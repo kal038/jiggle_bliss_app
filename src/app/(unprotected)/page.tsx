@@ -1,11 +1,12 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import type { Database } from '@/lib/database.types'
 import ProductCard from '@/components/product/ProductCard'
 import Link from 'next/link'
 
+type Product = Database['public']['Tables']['products']['Row']
+
 export default async function HomePage() {
-    const supabase = createServerComponentClient<Database>({ cookies })
+    const supabase = await createClient()
 
     //TODO: hit an api route to get the products instead of calling supabase directly
     const { data: products, error } = await supabase
@@ -39,7 +40,7 @@ export default async function HomePage() {
                         Featured Products
                     </h2>
                     <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {products?.map((product) => (
+                        {products?.map((product: Product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}
                     </div>

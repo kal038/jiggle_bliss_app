@@ -1,11 +1,13 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import type { Database } from '@/lib/database.types'
 import ProductCard from '@/components/product/ProductCard'
 
+type Product = Database['public']['Tables']['products']['Row']
+
 export default async function ProductsPage() {
     //init supa client for a server component
-    const supabase = createServerComponentClient<Database>({ cookies })
+    const supabase = await createClient()
     //fetch all products straight from DB
     const { data: products, error } = await supabase
         .from('products')
