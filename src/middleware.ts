@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+    console.log('Middleware running for:', req.nextUrl.pathname)
     // Create a Supabase client using the request and response objects
     let res = NextResponse.next({
         request: req,

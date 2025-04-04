@@ -6,7 +6,7 @@ export interface AuthState {
     user: User | null
     isLoading: boolean
     fetchCurrentUser: () => Promise<void>
-    signIn: (email: string, password: string) => Promise<void>
+    //signIn: (email: string, password: string) => Promise<void>
     signOut: () => Promise<void>
 }
 
@@ -23,19 +23,19 @@ export const useAuthStore = create<AuthState>((set, get) => {
             if (error) throw error
             set({ user: session?.user || null, isLoading: false })
         },
-        signIn: async (email, password) => {
-            try {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                })
-                if (error) throw error
-                await get().fetchCurrentUser()
-            } catch (error) {
-                console.error('Sign in error:', error)
-                throw error
-            }
-        },
+        // signIn: async (email, password) => {
+        //     try {
+        //         const { error } = await supabase.auth.signInWithPassword({
+        //             email,
+        //             password,
+        //         })
+        //         if (error) throw error
+        //         await get().fetchCurrentUser()
+        //     } catch (error) {
+        //         console.error('Sign in error:', error)
+        //         throw error
+        //     }
+        // },
         signOut: async () => {
             try {
                 await supabase.auth.signOut()

@@ -2,8 +2,24 @@ import { createClient } from '@/utils/supabase/server'
 import type { Database } from '@/lib/database.types'
 import ProductCard from '@/components/product/ProductCard'
 import Link from 'next/link'
+import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 type Product = Database['public']['Tables']['products']['Row']
+
+export async function GET(request: NextRequest) {
+    const url = new URL(request.url)
+    const code = url.searchParams.get('code')
+
+    if (code) {
+        const supabase = await createClient()
+        await supabase.auth.exchangeCodeForSession(code)
+        return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // If no code, NextJS will continue to render the page component
+    return NextResponse.next()
+}
 
 export default async function HomePage() {
     const supabase = await createClient()
