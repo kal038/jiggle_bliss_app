@@ -70,24 +70,32 @@ export async function signInWithPassword(formData: FormData) {
         password,
     })
 
+    // Check specifically for the email_not_confirmed error
     if (error) {
-        console.error('Error signing up:', error)
-        redirect('/auth/error')
-    }
-    // Check if email is verified
-    if (data.user && !data.user.email_confirmed_at) {
-        console.log('[Auth] Email not verified:', data.user.email)
+        console.error('Sign in error:', error)
 
-        // // Optional: Resend verification email
-        // await supabase.auth.resend({
-        //     type: 'signup',
-        //     email: email,
-        // })
+        // Check if this is an email verification error
+        if (
+            error.message === 'Email not confirmed' ||
+            (error as any)?.code === 'email_not_confirmed'
+        ) {
+            console.log('[Auth] Email not verified:', email)
 
-        return redirect('/auth/verify-required')
+            // // Optional: Resend verification email
+            // await supabase.auth.resend({
+            //     type: 'signup',
+            //     email: email,
+            // })
+
+            return redirect('/auth/verify-required')
+        }
+
+        // Handle other errors
+        return redirect('/auth/error')
     }
+
     if (data.user) {
-        console.log('User signed up:', data.user)
+        console.log('User signed in:', data.user)
     }
     if (data.session) {
         console.log('Session:', data.session)
