@@ -72,7 +72,19 @@ export async function signInWithPassword(formData: FormData) {
 
     if (error) {
         console.error('Error signing up:', error)
-        redirect('/error')
+        redirect('/auth/error')
+    }
+    // Check if email is verified
+    if (data.user && !data.user.email_confirmed_at) {
+        console.log('[Auth] Email not verified:', data.user.email)
+
+        // // Optional: Resend verification email
+        // await supabase.auth.resend({
+        //     type: 'signup',
+        //     email: email,
+        // })
+
+        return redirect('/auth/verify-required')
     }
     if (data.user) {
         console.log('User signed up:', data.user)
