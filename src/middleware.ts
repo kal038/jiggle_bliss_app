@@ -48,14 +48,14 @@ export async function middleware(req: NextRequest) {
         console.log('❌ No user found in session')
     }
     // Define protected routes, these are routes that require a session server side
-    const protectedRoutes = ['/dashboard', '/account', '/settings']
+    const protectedRoutes = ['/admin', '/account', '/checkout']
     const isProtectedRoute = protectedRoutes.some((route) =>
         req.nextUrl.pathname.startsWith(route)
     )
 
     if (isProtectedRoute && !user) {
         // If the user is not logged in and tries to access a protected route, redirect to the login page
-        return NextResponse.redirect(new URL('/login', req.url))
+        return NextResponse.redirect(new URL('/auth/login', req.url))
     }
 
     return res
