@@ -4,7 +4,10 @@ import { createClient } from '@/utils/supabase/server'
 import { get } from 'http'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-
+export type AuthError = {
+    type: 'email_not_confirmed' | 'invalid_credentials' | 'user_already_exists'
+    message: string
+}
 const getURL = (path: string = '') => {
     // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
     let url =
@@ -29,7 +32,7 @@ const getURL = (path: string = '') => {
     return path ? `${url}/${path}` : url
 }
 
-export async function signUp(formData: FormData) {
+export async function signUp(formData: FormData): Promise<void> {
     const callbackURL = getURL('auth/callback')
     console.log('[Auth] Sign up attempt - Callback URL:', callbackURL) //Should be "http://localhost:3000/auth/callback"
     const email = String(formData.get('email')).trim()
@@ -58,7 +61,9 @@ export async function signUp(formData: FormData) {
     redirect('/auth/confirm-email')
 }
 
-export async function signInWithPassword(formData: FormData) {
+export async function signInWithPassword(
+    formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
     const cookieStore = cookies()
     const email = String(formData.get('email')).trim()
     const password = String(formData.get('password')).trim()
@@ -91,7 +96,7 @@ export async function signInWithPassword(formData: FormData) {
         }
 
         // Handle other errors
-        return redirect('/auth/error')
+        return { error: error.message }
     }
 
     if (data.user) {
@@ -100,14 +105,5 @@ export async function signInWithPassword(formData: FormData) {
     if (data.session) {
         console.log('Session:', data.session)
     }
-    redirect('/')
-}
-
-export async function signOut(formData: FormData) {
-    const pathName = String(formData.get('pathName')).trim()
-
-    const supabase = await createClient()
-    const { error } = await supabase.auth.signOut()
-
-    return '/'
+    return { success: true }
 }

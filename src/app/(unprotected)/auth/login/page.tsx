@@ -1,13 +1,8 @@
 'use client'
-import Image from 'next/image'
-import { AuthError } from '@supabase/supabase-js'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-    signOut,
-    signInWithPassword,
-    signUp,
-} from '@/utils/auth-helpers/server'
+import { signInWithPassword, signUp } from '@/utils/auth-helpers/server'
+import { useAuthStore } from '@/store/useAuthStore'
 
 const validateEmail = (email: string): string | null => {
     /*
@@ -45,6 +40,8 @@ export default function LoginPage() {
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isSignUp, setIsSignUp] = useState(false)
+    const router = useRouter()
+    const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser)
 
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault()
@@ -88,7 +85,23 @@ export default function LoginPage() {
                 await signUp(formData)
             } else {
                 // Call the signInWithPassword server action
-                await signInWithPassword(formData)
+                const result = await signInWithPassword(formData)
+
+                if (result && 'error' in result) {
+                    // Handle error response
+                    setError(
+                        result.error ||
+                            'An unexpected error occurred during sign in'
+                    )
+                    return
+                }
+
+                if (result && 'success' in result) {
+                    // Success case - force a refresh to sync auth state
+                    await fetchCurrentUser()
+                    // Redirect to the home page
+                    router.push('/')
+                }
             }
         } catch (error) {
             console.error('Authentication error:', error)
