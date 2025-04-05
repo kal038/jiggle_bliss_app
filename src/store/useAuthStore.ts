@@ -35,6 +35,7 @@ export const useAuthStore = create<AuthState>()(
                     try {
                         await supabase.auth.signOut()
                         set({ user: null, isLoading: false })
+                        window.location.href = '/'
                     } catch (error) {
                         console.error('Error signing out', error)
                         set({ user: null, isLoading: false })
