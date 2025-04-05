@@ -1,6 +1,7 @@
 'use server'
 // following this implementation: https://github.com/vercel/nextjs-subscription-payments
 import { createClient } from '@/utils/supabase/server'
+import { get } from 'http'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -29,10 +30,12 @@ const getURL = (path: string = '') => {
 }
 
 export async function signUp(formData: FormData) {
-    const callbackURL = getURL('/auth/callback')
+    const callbackURL = getURL('auth/callback')
+    console.log('[Auth] Sign up attempt - Callback URL:', callbackURL) //Should be "http://localhost:3000/auth/callback"
     const email = String(formData.get('email')).trim()
     const password = String(formData.get('password')).trim()
     const supabase = await createClient()
+
     const { error, data } = await supabase.auth.signUp({
         email,
         password,
@@ -40,16 +43,18 @@ export async function signUp(formData: FormData) {
             emailRedirectTo: callbackURL,
         },
     })
+
     if (error) {
-        console.error('Error signing up:', error)
+        console.error('[Auth] Sign up failed:', error.message)
         redirect('/error')
     }
-    if (data.user) {
-        console.log('User signed up:', data.user)
-    }
-    if (data.session) {
-        console.log('Session:', data.session)
-    }
+
+    console.log('[Auth] Sign up successful', {
+        userId: data.user?.id,
+        email: data.user?.email,
+        sessionExists: !!data.session, //get boolean value
+    })
+
     redirect('/auth/confirm-email')
 }
 

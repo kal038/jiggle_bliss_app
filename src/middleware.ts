@@ -38,6 +38,15 @@ export async function middleware(req: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
+    // Log user data
+    console.log('👤 User authenticated:', !!user)
+    if (user) {
+        console.log('📧 User email:', user.email)
+        console.log('🆔 User ID:', user.id)
+        console.log('✅ Email verified:', !!user.email_confirmed_at)
+    } else {
+        console.log('❌ No user found in session')
+    }
     // Define protected routes, these are routes that require a session server side
     const protectedRoutes = ['/dashboard', '/account', '/settings']
     const isProtectedRoute = protectedRoutes.some((route) =>

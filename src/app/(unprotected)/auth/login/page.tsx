@@ -204,19 +204,6 @@ export default function LoginPage() {
 
     return (
         <main className="relative min-h-screen w-full">
-            {/* Hero image container */}
-            <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-black/40" />
-                <Image
-                    src="/images/hero-login.jpg"
-                    alt="Login hero image"
-                    className="object-cover"
-                    fill
-                    priority
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                />
-            </div>
-
             {/* Form container */}
             <div className="absolute inset-0 flex items-center justify-center px-4 py-6 sm:p-6">
                 <div className="w-full max-w-md space-y-6 rounded-xl bg-white/90 p-6 shadow-xl backdrop-blur-sm sm:space-y-8 sm:p-8">
