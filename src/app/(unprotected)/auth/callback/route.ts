@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Redirect to the home page or any other page you want
-    const redirectUrl = 'http://localhost:3000/auth/confirm-success' // Fallback to localhost if origin is not available
-
+    const redirectUrl = `${requestUrl.origin}/auth/confirm-success`
     return NextResponse.redirect(redirectUrl)
 }
