@@ -1,17 +1,17 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import {cookies} from 'next/headers'
-import { NextResponse, NextRequest } from "next/server";
-import type { Database } from "@/lib/database.types";
-
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
 export async function GET(request: NextRequest) {
-    const requestUrl: URL = new URL(request.nextUrl)
+    console.log('🔍 CALLBACK ROUTE HIT WITH URL:', request.url)
+    const requestUrl = new URL(request.url)
     const code = requestUrl.searchParams.get('code')
+    console.log('🔑 AUTH CODE FOUND:', code ? 'YES' : 'NO')
     if (code) {
-        const cookieStore = cookies()
-        const supabase = createRouteHandlerClient<Database>({cookies})
+        const supabase = await createClient()
         await supabase.auth.exchangeCodeForSession(code)
-
     }
 
-    return NextResponse.redirect(requestUrl.origin)
+    // Redirect to the home page or any other page you want
+    const redirectUrl = `${requestUrl.origin}/auth/confirm-success`
+    return NextResponse.redirect(redirectUrl)
 }

@@ -1,11 +1,28 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import type { Database } from '@/lib/database.types'
 import ProductCard from '@/components/product/ProductCard'
 import Link from 'next/link'
+import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+
+type Product = Database['public']['Tables']['products']['Row']
+
+export async function GET(request: NextRequest) {
+    const url = new URL(request.url)
+    const code = url.searchParams.get('code')
+
+    if (code) {
+        const supabase = await createClient()
+        await supabase.auth.exchangeCodeForSession(code)
+        return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // If no code, NextJS will continue to render the page component
+    return NextResponse.next()
+}
 
 export default async function HomePage() {
-    const supabase = createServerComponentClient<Database>({ cookies })
+    const supabase = await createClient()
 
     //TODO: hit an api route to get the products instead of calling supabase directly
     const { data: products, error } = await supabase
@@ -39,7 +56,7 @@ export default async function HomePage() {
                         Featured Products
                     </h2>
                     <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {products?.map((product) => (
+                        {products?.map((product: Product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}
                     </div>

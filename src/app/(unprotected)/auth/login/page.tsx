@@ -1,10 +1,8 @@
 'use client'
-
 import { useState } from 'react'
-import Image from 'next/image'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { AuthError } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { signInWithPassword, signUp } from '@/utils/auth-helpers/server'
+import { useAuthStore } from '@/store/useAuthStore'
 
 const validateEmail = (email: string): string | null => {
     /*
@@ -36,80 +34,81 @@ const validatePassword = (password: string): string | null => {
 }
 
 export default function LoginPage() {
-    const router = useRouter()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [fullName, setFullName] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
-    const [success, setSuccess] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [isSignUp, setIsSignUp] = useState(false)
+    const router = useRouter()
+    const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser)
 
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault()
         setError('')
-        setSuccess(false)
         setIsLoading(true)
 
-        // Add this line to test loading state
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-
-        const supabase = createClientComponentClient()
         try {
             // Validate email
             const validationErrorEmail = validateEmail(email)
             if (validationErrorEmail) {
                 setError(validationErrorEmail)
+                setIsLoading(false)
                 return
             }
 
+            // Create form data for submission
+            const formData = new FormData()
+            formData.append('email', email)
+            formData.append('password', password)
+
+            //save email to localStorage for confirmation page
+            localStorage.setItem('confirmationEmail', email)
+
             if (isSignUp) {
-                // Validate password
+                // Validate password for sign up
                 const validationErrorPassword = validatePassword(password)
                 if (validationErrorPassword) {
                     setError(validationErrorPassword)
+                    setIsLoading(false)
                     return
                 }
+
                 // Validate confirm password
                 if (password !== confirmPassword) {
                     setError('Passwords do not match')
+                    setIsLoading(false)
                     return
                 }
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        emailRedirectTo: `${window.location.origin}/auth/callback`,
-                    },
-                })
-                if (error) throw error
-                setSuccess(true)
+
+                // Call the signUp server action
+                await signUp(formData)
             } else {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                })
-                if (error) throw error
-                setSuccess(true)
-                router.push('/')
-                router.refresh()
+                // Call the signInWithPassword server action
+                const result = await signInWithPassword(formData)
+
+                if (result && 'error' in result) {
+                    // Handle error response
+                    setError(
+                        result.error ||
+                            'An unexpected error occurred during sign in'
+                    )
+                    return
+                }
+
+                if (result && 'success' in result) {
+                    // Success case - force a refresh to sync auth state
+                    await fetchCurrentUser()
+                    // Redirect to the home page
+                    router.push('/')
+                }
             }
         } catch (error) {
-            if (error instanceof AuthError) {
-                switch (error.message) {
-                    case 'Invalid login credentials':
-                        setError('Invalid email or password')
-                        break
-                }
-            } else {
-                setError('An unexpected error occurred. Please try again.')
-                console.error('Unexpected login error: ', error)
-            }
+            console.error('Authentication error:', error)
+            setError('An unexpected error occurred. Please try again.')
         } finally {
             setIsLoading(false)
         }
-        // all checks passed at this point
     }
     const renderMessages = () => (
         <div className="mt-4">
@@ -153,12 +152,15 @@ export default function LoginPage() {
                     Password
                 </label>
                 <input
+                    id="password"
+                    name="password"
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     placeholder="Password"
+                    disabled={isLoading}
                 />
             </div>
             {isSignUp && (
@@ -204,6 +206,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
                 className="group relative flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                disabled={isLoading}
             >
                 {isSignUp
                     ? 'Already have an account? Sign in instead'
@@ -214,19 +217,6 @@ export default function LoginPage() {
 
     return (
         <main className="relative min-h-screen w-full">
-            {/* Hero image container */}
-            <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-black/40" />
-                <Image
-                    src="/images/hero-login.jpg"
-                    alt="Login hero image"
-                    className="object-cover"
-                    fill
-                    priority
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                />
-            </div>
-
             {/* Form container */}
             <div className="absolute inset-0 flex items-center justify-center px-4 py-6 sm:p-6">
                 <div className="w-full max-w-md space-y-6 rounded-xl bg-white/90 p-6 shadow-xl backdrop-blur-sm sm:space-y-8 sm:p-8">

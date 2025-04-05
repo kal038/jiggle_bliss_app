@@ -9,7 +9,6 @@ import {
 import { useCartStore } from '@/store/useCartStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import CartPanel from '../cart/CartPanel'
-import DarkModeSwitch from './DarkModeSwitch'
 import type { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
@@ -25,24 +24,19 @@ export default function Navbar({ user, isLoading }: NavbarProps) {
     const router = useRouter()
     const [searchQuery, setSearchQuery] = useState('')
     const [isCartOpen, setIsCartOpen] = useState(false)
-    const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
     const totalItems = useCartStore((state) => state.getTotalItems())
+    const clearCart = useCartStore((state) => state.clearCart)
     const signOut = useAuthStore((state) => state.signOut)
 
     useEffect(() => {
         setMounted(true)
     }, [])
 
-    const isDarkMode = theme === 'dark'
-    // const handleThemeChange = (enabled: boolean) => {
-    //     setTheme(enabled ? 'dark' : 'light')
-    // }
-
     const handleSignOut = async () => {
         try {
+            clearCart()
             await signOut()
-            router.push('/') //forces a redirect to home, could this be handled with middlware?
         } catch (error) {
             console.error('Error signing out', error)
         }

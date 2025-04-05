@@ -1,30 +1,20 @@
 'use client'
-import { useAuthStore } from '@/store/useAuthStore'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
 import { useEffect } from 'react'
+import { useAuthStore } from '@/store/useAuthStore'
 
-interface AuthProviderProps {
-    children: React.ReactNode
-}
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const initializeAuthListener = useAuthStore(
+        (state) => state.initializeAuthListener
+    )
 
-// AuthProvider is a component that wraps the children with the AuthProvider
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser) // selector to only get fetchCurrentUser
-    const supabase = createClientComponentClient() //create supabase browser client
-    // useEffect on user change
     useEffect(() => {
-        fetchCurrentUser()
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((event, session) => {
-            console.log('event', event)
-            console.log('session', session) // logs the event and session
-            fetchCurrentUser()
-        })
-        return () => {
-            subscription.unsubscribe()
-        }
-    }, [fetchCurrentUser])
+        // Initialize the auth listener and get cleanup function
+        const unsubscribe = initializeAuthListener()
 
-    return children //renders the children
+        // Clean up on unmount
+        return unsubscribe
+    }, [initializeAuthListener])
+
+    return <>{children}</>
 }
